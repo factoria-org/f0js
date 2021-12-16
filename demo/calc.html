@@ -1,0 +1,34 @@
+<html>
+<head>
+<style>
+.container {
+  max-width: 800px;
+  margin: 50px auto;
+}
+a {
+  color: royalblue;
+  text-decoration: none;
+  display: block;
+}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.0-rc.0/web3.min.js"></script>
+<script src="/f0.js"></script>
+<script>
+const address = "0xf44ae16e44112b483168d9e048a1e7Bd73fb6351"
+const f0 = new F0()
+document.addEventListener("DOMContentLoaded", async () => {
+  await f0.init({
+    web3: new Web3(window.ethereum),
+    contract: "0x5716cf7a5A69729790b0d351770A081763294A30",
+  })
+  let r = await f0.invite("0x0000000000000000000000000000000000000000000000000000000000000000")
+  console.log("r", JSON.stringify(r,null,2))
+  let converted = await f0.calc(r)
+  console.log("converted", JSON.stringify(converted,null,2))
+})
+</script>
+</head>
+<body>
+<div class='container'></div>
+</body>
+</html>

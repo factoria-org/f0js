@@ -1,0 +1,57 @@
+<html>
+<head>
+<style>
+body {
+  font-family: Sans-serif;
+  font-size: 12px;
+}
+.box {
+  max-width: 300px;
+  margin: 100px auto;
+}
+.box > * {
+  display: block;
+  margin-bottom: 10px;
+  width: 100%;
+}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/timeago.js/4.0.2/timeago.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.7.7/handlebars.min.js"></script>
+<script src="/f0.js"></script>
+<script id="template" type="text/x-handlebars-template">
+  <img src="{{image}}">
+  <h1>{{title}}</h1>
+  <input id='count' type='nuber' value=1 placeholder='how many tokens to mint' min=1 max={{max}}>
+  <div>{{price}}</div>
+  <div>{{current}}/{{supply}}</div>
+  <div>{{account}}</div>
+  <button id='mint' data-key="{{key}}">Mint</button>
+  <div class='console'></div>
+</script>
+<script>
+const f0 = new F0()
+const { key, address } = f0.parse(location.href)
+const template = Handlebars.compile(document.querySelector("#template").innerHTML);
+document.addEventListener("DOMContentLoaded", async () => {
+  await f0.init(address)
+  document.querySelector(".box").innerHTML = template({
+    image: f0.placeholder.converted.image,
+    title: `${f0.name} (${f0.symbol})`,
+    max: f0.invites[key].condition.converted.limit,
+    price: `${f0.invites[key].condition.converted.price} ETH`,
+    current: f0.nextId,
+    supply: f0.config.converted.supply,
+    account: f0.account,
+    key: key,
+  })
+  document.querySelector("#mint").addEventListener("click", async (e) => {
+    let tokenIds = await f0.mint(key, document.querySelector("#count").value)
+    document.querySelector(".console").innerHTML = "minted " + tokenIds.join(", ")
+  })
+})
+</script>
+</head>
+<body>
+<div class='box'></div>
+</body>
+</html>

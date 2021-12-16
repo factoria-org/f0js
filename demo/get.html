@@ -1,0 +1,24 @@
+<html>
+<head>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.0-rc.0/web3.min.js"></script>
+<script src="f0.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", async () => {
+  const web3 = new Web3(window.ethereum)
+  const f0 = new F0();
+  await f0.init({
+    web3: web3,
+    contract: "0x072250B5001F5b0276BD1741495fB25dA11d84ac",
+  })
+  let token = await f0.get(42);
+  console.log(token)
+  document.querySelector("pre").innerHTML = JSON.stringify(token, null, 2)
+  document.querySelector("img").setAttribute("src", token.converted.image)
+})
+</script>
+</head>
+<body>
+  <pre></pre>
+  <img>
+</body>
+</html>

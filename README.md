@@ -54,7 +54,7 @@ Once created, you can interact with the contract using f0.js. This documentation
 Include at the top of your HTML:
 
 ```
-<script src="https://unpkg.com/f0js@0.0.6/dist/f0.js"></script>
+<script src="https://unpkg.com/f0js@0.0.10/dist/f0.js"></script>
 ```
 
 and you can start using the global variable `F0` like this:
@@ -184,13 +184,13 @@ token := {
 
 Get one token
 
-<iframe width="100%" height="600" src="//jsfiddle.net/skogard/g2n9srve/5/embedded/html,result/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
+<iframe width="100%" height="600" src="//jsfiddle.net/skogard/g2n9srve/8/embedded/html,result/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
 
 ### example: fetch multiple tokens
 
 Get multiple tokens
 
-<iframe width="100%" height="700" src="//jsfiddle.net/skogard/epw35jnc/7/embedded/html,result/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
+<iframe width="100%" height="700" src="//jsfiddle.net/skogard/epw35jnc/10/embedded/html,result/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
 
 
 ## 4. myInvites
@@ -296,7 +296,7 @@ You can use the invite object to display relevant information to the users, such
 
 ### example
 
-<iframe width="100%" height="900" src="//jsfiddle.net/skogard/qmzfxsoc/16/embedded/html,result/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
+<iframe width="100%" height="900" src="//jsfiddle.net/skogard/qmzfxsoc/20/embedded/html,result/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
 
 
 ## 5. invites
@@ -317,7 +317,7 @@ See [myInvites](#3-myinvites) section.
 
 ### example
 
-<iframe width="100%" height="600" src="//jsfiddle.net/skogard/cqmsazyj/10/embedded/html,result/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
+<iframe width="100%" height="600" src="//jsfiddle.net/skogard/cqmsazyj/12/embedded/html,result/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
 
 ## 6. invite
 
@@ -359,7 +359,53 @@ let tokens = await f0.mint(inviteKey, mintCount)
 
 ### example
 
-<iframe width="100%" height="600" src="//jsfiddle.net/skogard/pzkd182q/7/embedded/html,result/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
+<iframe width="100%" height="600" src="//jsfiddle.net/skogard/pzkd182q/9/embedded/html,result/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
+
+
+## 8. mintCost
+
+get the minting cost estimate.
+
+```javascript
+let estimate = await f0.mintCost(inviteKey, mintCount)
+```
+
+
+### parameters
+
+- `inviteKey`: the invite key to use for minting. if `null`, it will mint from the public launch invite.
+- `mintCount`: how many tokens to mint.
+
+### return value
+
+- `estimate`: the estimate cost for minting
+  - `eth`: The cost in eth
+  - `<currency>`: The cost converted to whichever currency you initialized `f0` with (through `f0.init()`)
+  - `gas`: The gas estimate
+
+Example:
+
+```json
+estimate := {
+  "eth": {
+    "fastest": 0.00639288,
+    "fast": 0.00631092,
+    "average": 0.00565524,
+    "safeLow": 0.00540936
+  },
+  "usd": {
+    "fastest": 25.6202976744,
+    "fast": 25.2918323196,
+    "average": 22.6641094812,
+    "safeLow": 21.6787134168
+  },
+  "gas": 81960
+}
+```
+
+### example
+
+<iframe width="100%" height="600" src="//jsfiddle.net/skogard/psLfdro9/3/embedded/html,result/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
 
 
 
@@ -386,7 +432,7 @@ the evm log
 
 ### example
 
-<iframe width="100%" height="800" src="//jsfiddle.net/skogard/76gyahzw/11/embedded/html,result/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
+<iframe width="100%" height="800" src="//jsfiddle.net/skogard/76gyahzw/12/embedded/html,result/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
 
 ## 9. nextId
 
@@ -539,7 +585,7 @@ The initialized `f0` object exposes an interface named `api` that lets you call 
 >
 > To learn what contract methods are available, take a look at https://dev.factoria.app/f0/#/?id=methods
 
-## 1. initialize
+## 1. initializing
 
 `f0.js` lets you inject any web3 instance into it to initialize.
 
@@ -591,7 +637,7 @@ await f0.init({
 })
 ```
 
-## 2. call methods
+## 2. calling methods
 
 Once initialized, the `f0` object lets you call web3 methods using its `api` interface:
 
@@ -602,6 +648,10 @@ which are equivalent to the following web3.js native contract methods:
 
 1. `contract.methods.<method_name>.call()`
 2. `contract.methods.<method_name>.send()`
+
+There is also one more method:
+
+- `f0.api.<method_name>.estimate()`: equivalent to calling `contract.methods.<method_name>.estimateGas()` and then applying current exchange rate and gas rate.
 
 The benefit of using `f0.api` interface is that you can use it cross-platform (both in browser and node.js).
 
@@ -627,8 +677,70 @@ let owner = await f0.api.ownerOf(1).call()
 ```
 
 
-<iframe width="100%" height="500" src="//jsfiddle.net/skogard/3y59xcu7/7/embedded/html,result/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
+<iframe width="100%" height="500" src="//jsfiddle.net/skogard/3y59xcu7/8/embedded/html,result/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
 
+### estimate
+
+You can estimate gas cost for all Web3 `send()` methods.
+
+Here's an example for estimating minting cost:
+
+```javascript
+let mintEstimate = await f0.api.mint({
+  key: "0x0000000000000000000000000000000000000000000000000000000000000000", proof: []
+}, 1).estimate({
+  from: f0.account,
+  value: "420000000000000000"
+})
+//
+//  mintEstimate := {
+//    "eth": {
+//      "fastest": 0.0099918,
+//      "fast": 0.0083265,
+//      "average": 0.007244055,
+//      "safeLow": 0.006577935
+//    },
+//    "usd": {
+//      "fastest": 40.033445634,
+//      "fast": 33.361204695000005,
+//      "average": 29.02424808465,
+//      "safeLow": 26.35535170905
+//    },
+//    "gas": 83265
+//  }
+//
+```
+
+Here's an example for estimating setConfig cost:
+
+```javascript
+let configEstimate = await f0.api.setConfig({
+  placeholder: "placeholder",
+  base: "baseURI",
+  supply: 1000,
+  permanent: false
+}).estimate({
+  from: f0.account,
+  value: "420000000000000000"
+})
+//
+//  configEstimate := {
+//    "eth": {
+//      "fastest": 0.00917952,
+//      "fast": 0.00803208,
+//      "average": 0.0069666,
+//      "safeLow": 0.00631092
+//    },
+//    "usd": {
+//      "fastest": 36.791975136000005,
+//      "fast": 32.192978244,
+//      "average": 27.92248113,
+//      "safeLow": 25.294482906000002
+//    },
+//    "gas": 81960
+//  }
+//
+```
 
 ---
 
@@ -658,7 +770,7 @@ the same javascript object, but with all occurrences of `ipfs://<cid>` replaced 
 
 ### example
 
-<iframe width="100%" height="650" src="//jsfiddle.net/skogard/736hgumn/6/embedded/html,result/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
+<iframe width="100%" height="650" src="//jsfiddle.net/skogard/736hgumn/7/embedded/html,result/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
 
 
 
@@ -701,7 +813,7 @@ none
 
 ### example
 
-<iframe width="100%" height="500" src="//jsfiddle.net/skogard/p2ndus4t/3/embedded/html,result/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
+<iframe width="100%" height="500" src="//jsfiddle.net/skogard/p2ndus4t/4/embedded/html,result/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
 
 
 ## 3. estimate
@@ -743,7 +855,7 @@ example:
 
 ### example
 
-<iframe width="100%" height="600" src="//jsfiddle.net/skogard/v0t2qpLd/7/embedded/html,result/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
+<iframe width="100%" height="600" src="//jsfiddle.net/skogard/v0t2qpLd/9/embedded/html,result/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
 
 
 ## 4. parseURL
@@ -781,7 +893,7 @@ Example:
 
 ### example
 
-<iframe width="100%" height="500" src="//jsfiddle.net/skogard/4p67h25c/6/embedded/html,result/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
+<iframe width="100%" height="500" src="//jsfiddle.net/skogard/4p67h25c/7/embedded/html,result/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
 
 ## 5. calc
 
@@ -835,4 +947,4 @@ attaches a `<currency>` attribute (default is 'usd') under the `"condition.conve
 
 ### example
 
-<iframe width="100%" height="500" src="//jsfiddle.net/skogard/j95wpavL/9/embedded/html,result/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
+<iframe width="100%" height="500" src="//jsfiddle.net/skogard/j95wpavL/11/embedded/html,result/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>

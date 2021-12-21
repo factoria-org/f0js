@@ -19,6 +19,7 @@ class F0 {
     } else {
       this.key = null
       this.wallet = null
+      await window.ethereum.request({ method: 'eth_requestAccounts' })
       let _res = await this.web3.eth.getAccounts()
       this.account = _res[0];
     }
@@ -95,8 +96,8 @@ class F0 {
                 from: (param && param.from ? param.from : this.account),
               }
               if (param && param.value) o.value = param.value
-              let r = await this.collection.methods[method.name](...args).estimateGas(o)
-              let e = await this.estimate(r)
+              let estimate = await this.collection.methods[method.name](...args).estimateGas(o)
+              let e = await this.estimate(estimate)
               e.gas = estimate
               return e
             }
@@ -175,6 +176,13 @@ class F0 {
   }
   symbol() {
     return this.collection.methods.symbol().call()
+  }
+  async mintCost(key, count) {
+    if (!key) { key = "0x0000000000000000000000000000000000000000000000000000000000000000" }
+    let auth = { key, proof: this._invites[key].proof }
+    let cost = "" + this._invites[key].condition.raw.price * count
+    let estimate = await this.api.mint(auth, count).estimate({ value: cost })
+    return estimate
   }
   async mint (key, count) {
     if (!key) { key = "0x0000000000000000000000000000000000000000000000000000000000000000" }

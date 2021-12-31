@@ -14,7 +14,7 @@ class F0 {
     if (options.network) {
       let net = await this.web3.eth.net.getNetworkType()
       if (net !== options.network) {
-        throw new Error(`Please sign into ${net} network`)
+        throw new Error(`Please sign into ${options.network} network`)
       }
     }
 

@@ -130,7 +130,8 @@ const f0 = await f0.init({
   web3: web3,                   // (required) an instantiated web3 instance (both browser/node.js supported)
   contract: contract_address,   // (required) contract address
   currency: currency,           // your fiat currency: usd, jpy, eur, etc. default is "usd"
-  key: private_key              // only in node.js environment
+  key: private_key,             // only in node.js environment
+  network: network              // "rinkeby" or "main" => explicitly set this attribute if you want to throw an error when the network is incorrect
 })
 ```
 
@@ -142,6 +143,7 @@ The `init()` method takes a single JSON argument, which can have the following a
 - `contract`: **(required)** the smart contract address
 - `currency`: your fiat currency: **"usd"**, **"jpy"**, **"eur"**, etc. The default is "usd".
 - `key`: your private key string (only in node.js environment).
+- `network`: "rinkby" or "main". This is optional but if you want to throw an error if the user is signed into a wrong network, explicitly set this field and catch the error using `try/catch`.
 
 ### return value
 
@@ -948,3 +950,58 @@ attaches a `<currency>` attribute (default is 'usd') under the `"condition.conve
 ### example
 
 <iframe width="100%" height="500" src="//jsfiddle.net/skogard/j95wpavL/11/embedded/html,result/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
+
+---
+
+# howto
+
+## 1. how to handle incorrect network
+
+A user may be signed into rinkeby network when the app is for mainnet, or the user may be signed into mainnet when the app is for rinkeby.
+
+To alert the user to sign into a different network in these cases, you can explicitly set the "network" and handle the thrown error.
+
+For example if you want an app to load from rinkeby and alert people to sign into rinkeby instead of mainnet, you can set the network to "rinkeby" and handle the exception:
+
+```javascript
+try {
+  await f0.init({
+    web3: new Web3(window.ethereum),
+    contract: contract_address,
+    network: "rinkeby"
+  })
+} catch (e) {
+  // display an alert
+  alert(e.message)
+}
+```
+
+## 2. how to display errors
+
+Whenever you try to interact with the blockchain using [send()](#send) and there's an error, or if you try to use the [mint()](#_7-mint) function and there's an error, it will fail silently.
+
+To display the error to the users, you can simply put the methods inside a `try/catch` clause and handle the error:
+
+```javascript
+try {
+  let tx = await f0.mint(null, 10)
+} catch (e) {
+  alert(e.message)
+}
+```
+
+or
+
+```javascript
+try {
+  let tokens = await f0.api.mint({
+    key: "0x0000000000000000000000000000000000000000000000000000000000000000", proof: []
+  }, 1).send({
+    value: "10000000000000000"
+  })
+} catch (e) {
+  alert(e.message)
+}
+```
+
+---

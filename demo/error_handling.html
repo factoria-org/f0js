@@ -14,25 +14,17 @@ a {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.0-rc.0/web3.min.js"></script>
 <script src="/f0.js"></script>
 <script>
-const address = "0xf44ae16e44112b483168d9e048a1e7Bd73fb6351"
 const f0 = new F0()
 document.addEventListener("DOMContentLoaded", async () => {
-  //await f0.init(address)
   await f0.init({
     web3: new Web3(window.ethereum),
     contract: "0x5716cf7a5A69729790b0d351770A081763294A30",
   })
-  let invites = await f0.invites()
-  console.log(invites)
-  document.querySelector(".container").innerHTML = Object.keys(f0.invites).map((key) => {
-    if (key === "0x0000000000000000000000000000000000000000000000000000000000000000") {
-      // public mint
-      return `<a href="/public#address=${address}">public mint</a>`
-    } else {
-      // private mint
-      return `<a href="/private#address=${address}&key=${key}">invite list ${key}</a>`
-    }
-  }).join("")
+  try {
+    let tokenIds = await f0.mint(null, 1000)
+  } catch (e) {
+    alert(e.message)
+  }
 })
 </script>
 </head>

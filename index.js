@@ -11,6 +11,13 @@ class F0 {
     this.address = options.contract;
     this.currency = options.currency ? options.currency : "usd"
 
+    if (options.network) {
+      let net = await this.web3.eth.net.getNetworkType()
+      if (net !== options.network) {
+        throw new Error(`Please sign into ${net} network`)
+      }
+    }
+
     // account
     if (options.key) {
       this.key = options.key
@@ -80,6 +87,7 @@ class F0 {
                 from: (param && param.from ? param.from : this.account),
               }
               if (param && param.value) o.value = param.value
+              let estimate = await this.collection.methods[method.name](...args).estimateGas(o)
               let r = await this.collection.methods[method.name](...args).send(o)
               return r
             },
@@ -289,7 +297,6 @@ class F0 {
     })
   }
   async cost() {
-    let net = await this.web3.eth.net.getNetworkType()
     let [gas, price] = await Promise.all([
       axios.get("https://ethgasstation.info/api/ethgasAPI.json").then((r) => {
         delete r.data.gasPriceRange

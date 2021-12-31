@@ -54,7 +54,7 @@ Once created, you can interact with the contract using f0.js. This documentation
 Include at the top of your HTML:
 
 ```
-<script src="https://unpkg.com/f0js@0.0.10/dist/f0.js"></script>
+<script src="https://unpkg.com/f0js@0.0.12/dist/f0.js"></script>
 ```
 
 and you can start using the global variable `F0` like this:

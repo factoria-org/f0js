@@ -352,7 +352,7 @@ let tokens = await f0.mint(inviteKey, mintCount, options)
 - `mintCount`: how many tokens to mint.
 - `options`: (optional) can have 2 of the attributes supported by web3.js (see https://web3js.readthedocs.io/en/v1.2.11/web3-eth-contract.html#id33). If unspecified, uses the default values suggested by the user's wallet:
   - `gas`: gas limit
-  - `gasPrice`: gas price
+  - `gasPrice`: gas price in wei
 
 ### return value
 
@@ -370,12 +370,23 @@ let tokens = await f0.mint(inviteKey, mintCount, options)
 
 For example, you may want to let people mint with the lowest (and slowest) gas fee option. You can:
 
-1. use the [#2-cost](cost()) method to get the different gas rate options, and find out the lowest rate.
+1. use the [cost()](#_2-cost) method to get the different gas rate options, and find out the lowest rate.
 2. call the `mint()` function with the `{ gasPrice: <lowest_gasPrice_option> }` as the `options` parameter.
+
+> Note that the `cost()` function returns the gas price in gwei, so you have to convert it to wei by multiplying 1000,000,000 (10 ^ 9)
+
+```javascript
+let cost = await f0.cost()
+let safeLowGwei = cost.gas.safeLow / 10   // to get the cost in gwei, you need to divide the values returned by `cost()` by 10 (see https://docs.ethgasstation.info/gas-price)
+let safeLowWei = safeLowGwei * Math.pow(10, 9)
+let tokens = await f0.mint(inviteKey, mintCount, {
+  gasPrice: "" + safeLowWei  // the gasPrice must be a string value of the number
+})
+```
 
 Another example, if you want to suggest multiple gas price options to the users, you may:
 
-1. use the [#2-cost](cost()) method to get the different gas rate options
+1. use the [cost()](#_2-cost) method to get the different gas rate options
 2. when the user selects one of the options, pass the `{ gasPrice: <the selected rate> }` as the `options` parameter.
 
 By default, if you don't pass the `options` parameter, it will automatically choose the safest option provided by the user's wallet. This is recommended in most cases but if you want to provide choice to your minters, you can use the `options` parameter.

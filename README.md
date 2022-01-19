@@ -54,7 +54,7 @@ Once created, you can interact with the contract using f0.js. This documentation
 Include at the top of your HTML:
 
 ```
-<script src="https://unpkg.com/f0js@0.0.13/dist/f0.js"></script>
+<script src="https://unpkg.com/f0js@0.0.14/dist/f0.js"></script>
 ```
 
 and you can start using the global variable `F0` like this:
@@ -343,13 +343,16 @@ The invite object for the invite key
 mint tokens using an invite key
 
 ```javascript
-let tokens = await f0.mint(inviteKey, mintCount)
+let tokens = await f0.mint(inviteKey, mintCount, options)
 ```
 
 ### parameters
 
 - `inviteKey`: the invite key to use for minting. if `null`, it will mint from the public launch invite.
 - `mintCount`: how many tokens to mint.
+- `options`: (optional) can have 2 of the attributes supported by web3.js (see https://web3js.readthedocs.io/en/v1.2.11/web3-eth-contract.html#id33). If unspecified, uses the default values suggested by the user's wallet:
+  - `gas`: gas limit
+  - `gasPrice`: gas price
 
 ### return value
 
@@ -363,13 +366,27 @@ let tokens = await f0.mint(inviteKey, mintCount)
 
 <iframe width="100%" height="600" src="//jsfiddle.net/skogard/pzkd182q/9/embedded/html,result/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
 
+### advanced (custom gas price)
+
+For example, you may want to let people mint with the lowest (and slowest) gas fee option. You can:
+
+1. use the [#_2-cost](cost()) method to get the different gas rate options, and find out the lowest rate.
+2. call the `mint()` function with the `{ gasPrice: <lowest_gasPrice_option> }` as the `options` parameter.
+
+Another example, if you want to suggest multiple gas price options to the users, you may:
+
+1. use the [#_2-cost](cost()) method to get the different gas rate options
+2. when the user selects one of the options, pass the `{ gasPrice: <the selected rate> }` as the `options` parameter.
+
+By default, if you don't pass the `options` parameter, it will automatically choose the safest option provided by the user's wallet. This is recommended in most cases but if you want to provide choice to your minters, you can use the `options` parameter.
+
 
 ## 8. mintCost
 
 get the minting cost estimate.
 
 ```javascript
-let estimate = await f0.mintCost(inviteKey, mintCount)
+let estimate = await f0.mintCost(inviteKey, mintCount, options)
 ```
 
 
@@ -377,6 +394,9 @@ let estimate = await f0.mintCost(inviteKey, mintCount)
 
 - `inviteKey`: the invite key to use for minting. if `null`, it will mint from the public launch invite.
 - `mintCount`: how many tokens to mint.
+- `options`: (optional) can have 2 of the attributes supported by web3.js (see https://web3js.readthedocs.io/en/v1.2.11/web3-eth-contract.html#id33). If unspecified, uses the default values suggested by the user's wallet:
+  - `gas`: gas limit
+  - `gasPrice`: gas price
 
 ### return value
 

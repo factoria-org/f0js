@@ -23,7 +23,7 @@ describe("methods ", () => {
       })
       console.log("tokens", tokens)
     })
-    it("setConfig", async () => {
+    it.skip("setConfig", async () => {
       await f0.init({
         web3: web3,
         //contract: "0x5716cf7a5A69729790b0d351770A081763294A30",

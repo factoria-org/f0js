@@ -193,18 +193,22 @@ class F0 {
   symbol() {
     return this.collection.methods.symbol().call()
   }
-  async mintCost(key, count) {
+  async mintCost(key, count, options) {
     if (!key) { key = "0x0000000000000000000000000000000000000000000000000000000000000000" }
     let auth = { key, proof: this._invites[key].proof }
     let cost = "" + this._invites[key].condition.raw.price * count
-    let estimate = await this.api.mint(auth, count).estimate({ value: cost })
+    let o = (options ? options : {});
+    o.value = cost;
+    let estimate = await this.api.mint(auth, count).estimate(o)
     return estimate
   }
-  async mint (key, count) {
+  async mint (key, count, options) {
     if (!key) { key = "0x0000000000000000000000000000000000000000000000000000000000000000" }
     let auth = { key, proof: this._invites[key].proof }
     let cost = "" + this._invites[key].condition.raw.price * count
-    let tx = await this.api.mint(auth, count).send({ value: cost })
+    let o = (options ? options : {});
+    o.value = cost;
+    let tx = await this.api.mint(auth, count).send(o)
     let tokenIds;
     if (this.key) {
       tokenIds = tx.logs.map((log) => {

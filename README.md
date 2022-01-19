@@ -370,12 +370,12 @@ let tokens = await f0.mint(inviteKey, mintCount, options)
 
 For example, you may want to let people mint with the lowest (and slowest) gas fee option. You can:
 
-1. use the [#_2-cost](cost()) method to get the different gas rate options, and find out the lowest rate.
+1. use the [#2-cost](cost()) method to get the different gas rate options, and find out the lowest rate.
 2. call the `mint()` function with the `{ gasPrice: <lowest_gasPrice_option> }` as the `options` parameter.
 
 Another example, if you want to suggest multiple gas price options to the users, you may:
 
-1. use the [#_2-cost](cost()) method to get the different gas rate options
+1. use the [#2-cost](cost()) method to get the different gas rate options
 2. when the user selects one of the options, pass the `{ gasPrice: <the selected rate> }` as the `options` parameter.
 
 By default, if you don't pass the `options` parameter, it will automatically choose the safest option provided by the user's wallet. This is recommended in most cases but if you want to provide choice to your minters, you can use the `options` parameter.

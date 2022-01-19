@@ -51,6 +51,8 @@ class F0 {
                 data: data,
               }
               if (param && param.value) o.value = param.value
+              if (param && param.gas) o.gas = param.gas
+              if (param && param.gasPrice) o.gasPrice = param.gasPrice
               let estimate = await action.estimateGas(o)
               o.gas = estimate
               const signedTx = await this.wallet.signTransaction(o)
@@ -69,6 +71,8 @@ class F0 {
                 data: data,
               }
               if (param && param.value) o.value = param.value
+              if (param && param.gas) o.gas = param.gas
+              if (param && param.gasPrice) o.gasPrice = param.gasPrice
               let estimate = await action.estimateGas(o)
               let e = await this.estimate(estimate)
               e.gas = estimate
@@ -87,6 +91,8 @@ class F0 {
                 from: (param && param.from ? param.from : this.account),
               }
               if (param && param.value) o.value = param.value
+              if (param && param.gas) o.gas = param.gas
+              if (param && param.gasPrice) o.gasPrice = param.gasPrice
               let estimate = await this.collection.methods[method.name](...args).estimateGas(o)
               let r = await this.collection.methods[method.name](...args).send(o)
               return r
@@ -104,6 +110,8 @@ class F0 {
                 from: (param && param.from ? param.from : this.account),
               }
               if (param && param.value) o.value = param.value
+              if (param && param.gas) o.gas = param.gas
+              if (param && param.gasPrice) o.gasPrice = param.gasPrice
               let estimate = await this.collection.methods[method.name](...args).estimateGas(o)
               let e = await this.estimate(estimate)
               e.gas = estimate

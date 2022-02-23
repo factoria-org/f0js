@@ -26,7 +26,9 @@ class F0 {
     } else {
       this.key = null
       this.wallet = null
-      await window.ethereum.request({ method: 'eth_requestAccounts' })
+      if (globalThis.ethereum) {
+        await globalThis.ethereum.request({ method: 'eth_requestAccounts' })
+      }
       let _res = await this.web3.eth.getAccounts()
       this.account = _res[0];
     }

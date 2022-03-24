@@ -151,13 +151,15 @@ class F0 {
         invite.proof = []
         invite.invited = true
       } else {
-        let res = await axios.get("https://ipfs.io/ipfs/" + invite.cid).then((r) => {
-          return r.data
-        })
-        invite.list = res.addresses
-        let list = new Invitelist(invite.list)
-        invite.proof = list.proof(this.account)
-        invite.invited = list.verify(this.account, invite.proof)
+        try {
+          let res = await axios.get("https://ipfs.io/ipfs/" + invite.cid).then((r) => {
+            return r.data
+          })
+          invite.list = res.addresses
+          let list = new Invitelist(invite.list)
+          invite.proof = list.proof(this.account)
+          invite.invited = list.verify(this.account, invite.proof)
+        } catch (e) { }
       }
       this._invites[key] = invite
     }

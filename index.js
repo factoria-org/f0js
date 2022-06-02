@@ -124,6 +124,11 @@ class F0 {
       }
     }
     // invites
+    if (options.invites) {
+      // if an "invites" object is passed manually, set the _invite attribute and return immediately
+      this._invites = options.invites
+      return;
+    }
     let logs = await this.collection.getPastEvents("Invited", { fromBlock: 0, toBlock  : "latest", })
     for(let log of logs) {
       let key = log.returnValues.key

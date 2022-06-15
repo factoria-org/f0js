@@ -4,12 +4,34 @@ const axios = require('axios')
 const traverse = require('traverse')
 const Invitelist = require('invitelist')
 class F0 {
+  async fetcher(url) {
+    // If already cached, use the cached value
+    if (this.cached[url]) {
+      return this.cached[url]
+    }
+    // If not cached, fetch and cache it into the this.cached object
+    else {
+      let res = await axios.get(url).then((r) => {
+        return r.data
+      })
+      if (this.cache) {
+        this.cached[url] = res
+      }
+      return res
+    }
+  }
   async init (options) {
     this.abi = abi;
     this._invites = {}
     this.web3 = options.web3;
     this.address = options.contract;
     this.currency = options.currency ? options.currency : "usd"
+    this.cache = options.cache
+    if (options.cached) {
+      this.cached = options.cached
+    } else {
+      this.cached = {}
+    }
 
     if (options.network) {
       let net = await this.web3.eth.net.getNetworkType()
@@ -124,11 +146,6 @@ class F0 {
       }
     }
     // invites
-    if (options.invites) {
-      // if an "invites" object is passed manually, set the _invite attribute and return immediately
-      this._invites = options.invites
-      return;
-    }
     let logs = await this.collection.getPastEvents("Invited", { fromBlock: 0, toBlock  : "latest", })
     for(let log of logs) {
       let key = log.returnValues.key
@@ -157,10 +174,9 @@ class F0 {
         invite.invited = true
       } else {
         try {
-          let res = await axios.get("https://ipfs.io/ipfs/" + invite.cid).then((r) => {
-            return r.data
-          })
+          let res = await this.fetcher("https://ipfs.io/ipfs/" + invite.cid)
           invite.list = res.addresses
+          if (res.name) invite.name = res.name
           let list = new Invitelist(invite.list)
           invite.proof = list.proof(this.account)
           invite.invited = list.verify(this.account, invite.proof)
@@ -185,9 +201,7 @@ class F0 {
   }
   async placeholder() {
     let config = await this.config()
-    let p = await axios.get(config.converted.placeholder).then((r) => {
-      return r.data
-    })
+    let p = await this.fetcher(config.converted.placeholder)
     return {
       raw: p,
       converted: this.convert(p)
@@ -234,11 +248,13 @@ class F0 {
       let urls = {
         rinkeby: {
           opensea: `https://testnets.opensea.io/assets/${this.address}/${tokenId}`,
-          rarible: `https://rinkeby.rarible.com/token/${this.address}:${tokenId}`
+          rarible: `https://rinkeby.rarible.com/token/${this.address.toLowerCase()}:${tokenId}`,
+          looksrare: `https://rinkeby.looksrare.org/collections/${this.address}:${tokenId}`
         },
         main: {
           opensea: `https://opensea.io/assets/${this.address}/${tokenId}`,
-          rarible: `https://rarible.com/token/${this.address}:${tokenId}`
+          rarible: `https://rarible.com/token/${this.address.toLowerCase()}:${tokenId}`,
+          looksrare: `https://looksrare.org/collections/${this.address}:${tokenId}`
         }
       }
       return {
@@ -281,9 +297,7 @@ class F0 {
     let placeholder = await this.placeholder()
     if (config.converted.base) {
       tokenURI = `${config.converted.base}${tokenId}.json` 
-      r = await axios.get(tokenURI).then((r) => {
-        return r.data
-      })
+      r = await this.fetcher(tokenURI)
     } else if (config.converted.placeholder) {
       tokenURI = config.raw.placeholder
       r = placeholder.raw

@@ -10,7 +10,8 @@ describe("invites", () => {
     await f0.init({
       web3: web3,
       //contract: "0x072250B5001F5b0276BD1741495fB25dA11d84ac",
-      contract: "0xF655377696496746b9BFC09075f0F0ba5745a23B",
+      //contract: "0xF655377696496746b9BFC09075f0F0ba5745a23B",
+      contract: "0xD7eEa022eF295D893c56634c2Eba7f289fcd158B",
       key: process.env.RINKEBY_PRIVATE_KEY
     })
     let r = await f0.invites()

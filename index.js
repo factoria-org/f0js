@@ -4,6 +4,12 @@ const axios = require('axios')
 const traverse = require('traverse')
 const Invitelist = require('invitelist')
 class F0 {
+  constructor () {
+    this._initialized = {}
+    this._invites = {}
+    this._processed = new Set()
+    this.abi = abi;
+  }
   async fetcher(url) {
     // If already cached, use the cached value
     if (this.cached[url]) {
@@ -21,8 +27,6 @@ class F0 {
     }
   }
   async init (options) {
-    this.abi = abi;
-    this._invites = {}
     this.web3 = options.web3;
     this.address = options.contract;
     this.currency = options.currency ? options.currency : "usd"
@@ -149,6 +153,11 @@ class F0 {
     let logs = await this.collection.getPastEvents("Invited", { fromBlock: 0, toBlock  : "latest", })
     for(let log of logs) {
       let key = log.returnValues.key
+      if (this._processed.has(key)) {
+        continue
+      } else {
+        this._processed.add(key)
+      }
       let condition = await this.collection.methods.invite(log.returnValues.key).call()
       let rawCondition = {
         price: parseInt(condition.price),
@@ -163,6 +172,10 @@ class F0 {
       let invite = {
         key: log.returnValues.key,
         cid: ipfsh.dtoc(log.returnValues.cid),
+        cids: {
+          dp: ipfsh.toCid(log.returnValues.cid, "dag-pb"),
+          raw: ipfsh.toCid(log.returnValues.cid, "raw")
+        },
         condition: {
           raw: rawCondition,
           converted: convertedCondition
@@ -173,8 +186,25 @@ class F0 {
         invite.proof = []
         invite.invited = true
       } else {
+        if (this._initialized[key]) {
+          return 
+        }
         try {
-          let res = await this.fetcher("https://ipfs.io/ipfs/" + invite.cid)
+          // Try both "dag-pb" and "raw", and take the first one that resolves.
+          let { res, cid } = await Promise.any([invite.cids.dp, invite.cids.raw].map((cid) => {
+            return new Promise((resolve, reject) => {
+              this.fetcher("https://ipfs.io/ipfs/" + cid).then((res) => {
+                if (typeof res === "object") {
+                  resolve({ res, cid })
+                } else {
+                  reject(new Error("invalid merkle tree"))
+                }
+              }).catch((e) => {
+                reject(e)
+              })
+            })
+          }))
+          invite.cid = cid
           invite.list = res.addresses
           if (res.name) invite.name = res.name
           let list = new Invitelist(invite.list)
@@ -183,6 +213,7 @@ class F0 {
         } catch (e) { }
       }
       this._invites[key] = invite
+      this._initialized[key] = true
     }
   }
   async config() {
@@ -265,7 +296,6 @@ class F0 {
   }
   async calc(invite) {
     let { gas, price } = await this.cost()
-    console.log("#", gas, price)
     let currency = this.currency
     return traverse(invite).map(function (x) {
       if (this.isLeaf && this.key === "eth") {

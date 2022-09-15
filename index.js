@@ -278,14 +278,19 @@ class F0 {
     return tokenIds.map((tokenId) => {
       let urls = {
         rinkeby: {
-          opensea: `https://testnets.opensea.io/assets/${this.address}/${tokenId}`,
+          opensea: `https://testnets.opensea.io/assets/rinkeby/${this.address}/${tokenId}`,
           rarible: `https://rinkeby.rarible.com/token/${this.address.toLowerCase()}:${tokenId}`,
-          looksrare: `https://rinkeby.looksrare.org/collections/${this.address}:${tokenId}`
+          looksrare: `https://rinkeby.looksrare.org/collections/${this.address}/${tokenId}`
         },
         main: {
           opensea: `https://opensea.io/assets/${this.address}/${tokenId}`,
           rarible: `https://rarible.com/token/${this.address.toLowerCase()}:${tokenId}`,
-          looksrare: `https://looksrare.org/collections/${this.address}:${tokenId}`
+          looksrare: `https://looksrare.org/collections/${this.address}/${tokenId}`
+        },
+        goerli: {
+          opensea: `https://testnets.opensea.io/assets/goerli/${this.address}/${tokenId}`,
+          rarible: `https://testnet.rarible.com/token/${this.address.toLowerCase()}:${tokenId}`,
+          looksrare: `https://goerli.looksrare.org/collections/${this.address}/${tokenId}`
         }
       }
       return {
